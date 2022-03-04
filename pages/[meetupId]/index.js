@@ -11,4 +11,37 @@ function MeetupDetails() {
   );
 }
 
+// needed if using getStatic props for a dynamically routed page
+// all versions of page must be pregenerated on build
+export async function getStaticPaths() {
+  // specify all routes that must be built
+  return {
+    // false = paths array contains all paths/return 404 to user for invalid path
+    // true = will generate new page on request if not in paths array
+    fallback: false,
+    paths: [
+      {
+        params: {
+          meetupId: "m1",
+        },
+      },
+      {
+        params: {
+          meetupId: "m2",
+        },
+      },
+    ],
+  };
+}
+
+export async function getStaticProps(context) {
+  const meetupId = context.params.meetupId;
+
+  return {
+    props: {
+      meetupData: {},
+    },
+  };
+}
+
 export default MeetupDetails;
