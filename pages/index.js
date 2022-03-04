@@ -1,31 +1,5 @@
+import { MongoClient } from 'mongodb'
 import MeetupList from "../components/meetups/MeetupList";
-
-const DUMMY_MEETUPS = [
-  {
-    id: "m1",
-    title: "A First Meetup",
-    image:
-      "https://assets.simpleviewinc.com/simpleview/image/upload/c_limit,h_1200,q_75,w_1200/v1/clients/austin/austin2_copy_1__211bcd0d-a354-4c0f-8203-107ad7774905.jpg",
-    address: "100 Main Street, 12345 Austin TX",
-    description: "This is a first meetup!",
-  },
-  {
-    id: "m2",
-    title: "A Second Meetup",
-    image:
-      "https://assets.simpleviewinc.com/simpleview/image/upload/c_limit,h_1200,q_75,w_1200/v1/clients/austin/austin2_copy_1__211bcd0d-a354-4c0f-8203-107ad7774905.jpg",
-    address: "100 Main Street, 12345 Austin TX",
-    description: "This is a second meetup!",
-  },
-  {
-    id: "m3",
-    title: "A Third Meetup",
-    image:
-      "https://assets.simpleviewinc.com/simpleview/image/upload/c_limit,h_1200,q_75,w_1200/v1/clients/austin/austin2_copy_1__211bcd0d-a354-4c0f-8203-107ad7774905.jpg",
-    address: "100 Main Street, 12345 Austin TX",
-    description: "This is a third meetup!",
-  },
-];
 
 function HomePage(props) {
   return <MeetupList meetups={props.meetups} />;
@@ -46,10 +20,25 @@ function HomePage(props) {
 
 // specifically structured function for page pre-rendering with data
 export async function getStaticProps() {
+
+  const client = await MongoClient.connect('mongodb+srv://landonskinner:I9IXYnbfGaqZu0dt@cluster0.ibkl3.mongodb.net/meetups?retryWrites=true&w=majority')
+  const db = client.db()
+
+  const meetupsCollection = db.collection('meetups');
+
+  const meetups = await meetupsCollection.find().toArray();
+
+  client.close();
+
   // need to return data in form of object with props as key
   return {
     props: {
-      meetups: DUMMY_MEETUPS,
+      meetups: meetups.map(meetup => ({
+        title: meetup.title,
+        address: meetup.address,
+        image: meetup.image,
+        id: meetup._id.toString()
+      }))
     },
     // specifies frequency of data refetching after build
     revalidate: 10,
