@@ -37,7 +37,8 @@ export async function getStaticPaths() {
   return {
     // false = paths array contains all paths/return 404 to user for invalid path
     // true = will generate new page on request if not in paths array
-    fallback: false,
+    // blocking = will generate new page like true, but doesn't display empty waiting page
+    fallback: 'blocking',
     paths: meetups.map((meetup) => ({
       params: { meetupId: meetup._id.toString() },
     })),
